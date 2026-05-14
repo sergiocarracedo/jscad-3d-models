@@ -1,0 +1,33 @@
+xps-support.js
+  s_93c1ba2add9e13::t_c852288967a600 137,141-142
+  s_93c1ba2add9e13::t_bc1eb631438c27 229-230,244-245
+  s_93c1ba2add9e13::t_ca4f85385520c3 126,128-129,138-140,267
+  s_93c1ba2add9e13::t_afb9370e54c407 213,224,257-262
+  h_f90ee31b03fc41 7,9,11-12,14,22-23,27-33,35,37,41,45,212,214-223,277-279,282,293-294,398-406,408-409,419,421-422,428,432,447
+  s_93c1ba2add9e13::t_458c300d58621c 416
+  s_93c1ba2add9e13::t_49c4d456c7d94e 225
+  s_93c1ba2add9e13::t_27077633d585c4 25-26,420,423-427,429-431
+  s_93c1ba2add9e13::t_57cca9dab64b69 387-397,407,410-415,417-418,435-436
+  s_93c1ba2add9e13::t_4fb817deb43329 46-48,61-123,127,130-136,273-275
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "b95f577c071c2002b696325f51b16a1066e104e2",
+  "prompts": {},
+  "humans": {
+    "h_f90ee31b03fc41": {
+      "author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    }
+  },
+  "sessions": {
+    "s_93c1ba2add9e13": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "eeb6aab5-7878-4bd8-9d16-f87c5ec4672f",
+        "model": "gpt-5-mini"
+      },
+      "human_author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    }
+  }
+}
