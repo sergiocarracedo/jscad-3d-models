@@ -4,12 +4,14 @@ const { booleans, colors, extrusions, primitives, transforms } = modeling
 
 
 // Internal space dimensions, in millimeters
-const internalWidth = 150
+const internalWidth = 185
 const internalHeight = 18 + 18
-const internalDeep = 25
+const internalDeep = 30
 
-const cutoutHeight = 18
-const cutoutWidth = 20 
+const cutoutHeight = 20
+const cutoutWidth = 22 
+
+const borderRadius = 2
 
 const verticalWallThickness = 5
 const floorThickness = 3
@@ -17,18 +19,31 @@ const ceilThickness = 3
 const ribRadius = 4
 const ribSegments = 16
 
-const supportHolesRadius = 6.2
-const supportHolesRadiusInternal = 4
+const supportHolesDim = 6.2
+const supportHolesDimInternal = 4
 const supportHolesGap = 6.5
+const supportHolesGuideHeight = 0.5
+const supportHolesGuideLift = 0.35
 
-const wallLightenCutoutHorizontalGap = 10
+const supportHolesGridOrigin = {
+  x: 32.6 - cutoutWidth - supportHolesGap,
+  z: 5,
+}
+const supportHolesBoxColumns = 15
+const supportHolesBoxRows = 2
+
+const wallLightenCutoutHorizontalGap = 15
 const wallLightenCutoutVerticalGap = 0
-const wallLightenCutoutMaxMin = [20, 50]
+const wallLightenCutoutMaxMin = [20, 200]
 
 
 const floorLightenCutoutHorizontalGap = 15
-const floorLightenCutoutDeepGap = 20
+const floorLightenCutoutDeepGap = 7
 const floorLightenCutoutMaxMin = [20, 50]
+
+
+const floorRoundedCorners = ['back-left', 'back-right']
+const ceilRoundedCorners = ['back-left', 'back-right']
 
 
 
@@ -41,6 +56,88 @@ const startCuboid = (params) => {
     start[2] + size[2] / 2
   ]
   return primitives.cuboid({ ...params, size, center, })
+}
+
+const allRoundedCorners = ['front-left', 'front-right', 'back-right', 'back-left']
+
+const normalizeRoundedCorners = (roundedCorners) => {
+  if (roundedCorners === 'all') return new Set(allRoundedCorners)
+  if (Array.isArray(roundedCorners)) {
+    return new Set(roundedCorners.filter((corner) => allRoundedCorners.includes(corner)))
+  }
+
+  return new Set()
+}
+
+const addArcPoints = (points, center, radius, startAngle, endAngle) => {
+  for (let index = 1; index <= ribSegments; index += 1) {
+    const ratio = index / ribSegments
+    const angle = startAngle + (endAngle - startAngle) * ratio
+
+    points.push([
+      center[0] + radius * Math.cos(angle),
+      center[1] + radius * Math.sin(angle),
+    ])
+  }
+}
+
+const selectiveRoundedRectanglePoints = ({ width, depth, radius, roundedCorners }) => {
+  const corners = normalizeRoundedCorners(roundedCorners)
+  const effectiveRadius = Math.min(radius, width / 2, depth / 2)
+
+  if (effectiveRadius <= 0 || corners.size === 0) {
+    return [[0, 0], [width, 0], [width, depth], [0, depth]]
+  }
+
+  const points = []
+  const frontLeftRounded = corners.has('front-left')
+  const frontRightRounded = corners.has('front-right')
+  const backRightRounded = corners.has('back-right')
+  const backLeftRounded = corners.has('back-left')
+
+  points.push(frontLeftRounded ? [effectiveRadius, 0] : [0, 0])
+  points.push(frontRightRounded ? [width - effectiveRadius, 0] : [width, 0])
+
+  if (frontRightRounded) {
+    addArcPoints(points, [width - effectiveRadius, effectiveRadius], effectiveRadius, -Math.PI / 2, 0)
+  }
+
+  points.push(backRightRounded ? [width, depth - effectiveRadius] : [width, depth])
+
+  if (backRightRounded) {
+    addArcPoints(points, [width - effectiveRadius, depth - effectiveRadius], effectiveRadius, 0, Math.PI / 2)
+  }
+
+  points.push(backLeftRounded ? [effectiveRadius, depth] : [0, depth])
+
+  if (backLeftRounded) {
+    addArcPoints(points, [effectiveRadius, depth - effectiveRadius], effectiveRadius, Math.PI / 2, Math.PI)
+  }
+
+  points.push(frontLeftRounded ? [0, effectiveRadius] : [0, 0])
+
+  if (frontLeftRounded) {
+    addArcPoints(points, [effectiveRadius, effectiveRadius], effectiveRadius, Math.PI, Math.PI * 1.5)
+  }
+
+  return points
+}
+
+const startRoundedSlab = (params) => {
+  const { start, size, roundedCorners = 'all' } = params
+  const [width, depth, height] = size
+  const roundRadius = Math.min(borderRadius, width / 2, depth / 2)
+  const profile = primitives.polygon({
+    points: selectiveRoundedRectanglePoints({
+      width,
+      depth,
+      radius: roundRadius,
+      roundedCorners,
+    }),
+  })
+  const slab = extrusions.extrudeLinear({ height }, profile)
+
+  return transforms.translate(start, slab)
 }
 
 const quarterCircleProfilePoints = ({ radius, horizontalDirection }) => {
@@ -98,7 +195,6 @@ const calculateLightenHoles = ({ spanWidth, sidePadding, gap, sizeRange, roundRa
   const usableWidth = spanWidth - effectiveSidePadding * 2
 
   if (usableWidth < minWidth) return []
-
   const minimumHoleCount = Math.max(1, Math.ceil((usableWidth + effectiveGap) / (maxWidth + effectiveGap)))
   const maximumHoleCount = Math.max(1, Math.floor((usableWidth + effectiveGap) / (minWidth + effectiveGap)))
 
@@ -113,9 +209,25 @@ const calculateLightenHoles = ({ spanWidth, sidePadding, gap, sizeRange, roundRa
   }))
 }
 
+const distributeSupportHoles = ({ origin, holeDim, reservedDim, rows, cols, rowGap, colGap }) => {
+
+  const res = []
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < cols; col += 1) {
+      const centerX = origin.x + col * (reservedDim - holeDim + colGap) + reservedDim / 2
+      const centerZ = origin.z + row * (reservedDim - holeDim + rowGap) + reservedDim / 2
+      console.log(`Hole at row ${row}, col ${col}: centerX=${centerX}, centerZ=${centerZ}`)
+      res.push({ centerX, centerZ, radius: holeDim / 2 })
+    }
+  }
+  return res
+}
+
+
 const startRoundedRectangleWallHole = ({ start, size, length }) => {
   const [width, height] = size
-  const roundRadius = Math.min(ribRadius, width / 2, height / 2)
+  const maxRoundRadius = Math.max(0, Math.min(width, height) / 2 - 0.01)
+  const roundRadius = Math.min(ribRadius, maxRoundRadius)
   const profile = primitives.roundedRectangle({
     center: [width / 2, height / 2],
     size: [width, height],
@@ -129,7 +241,8 @@ const startRoundedRectangleWallHole = ({ start, size, length }) => {
 
 const startRoundedRectangleFloorHole = ({ start, size, length }) => {
   const [width, depth] = size
-  const roundRadius = Math.min(ribRadius, width / 2, depth / 2)
+  const maxRoundRadius = Math.max(0, Math.min(width, depth) / 2 - 0.01)
+  const roundRadius = Math.min(ribRadius, maxRoundRadius)
   const profile = primitives.roundedRectangle({
     center: [width / 2, depth / 2],
     size: [width, depth],
@@ -141,21 +254,32 @@ const startRoundedRectangleFloorHole = ({ start, size, length }) => {
   return transforms.translate(start, hole)
 }
 
+const startCeilingCylinderHole = ({ center, radius, height }) => primitives.cylinder({
+  center,
+  radius,
+  height,
+  segments: Math.max(ribSegments * 2, 32),
+})
+
 
 const main = () => {
     // Floor
-  const floor = startCuboid({ 
+  const floor = startRoundedSlab({ 
     start: [0, verticalWallThickness, 0], 
     size: [
         internalWidth, 
         internalDeep - verticalWallThickness, 
         floorThickness
-    ] })
+    ],
+    roundedCorners: floorRoundedCorners,
+  })
 
-  const floorLightenHoleDepth = internalDeep - verticalWallThickness - floorLightenCutoutDeepGap * 2
+  const floorUsableDepth = internalDeep - verticalWallThickness - ribRadius
+  
+  const floorLightenHoleDepth = floorUsableDepth - floorLightenCutoutDeepGap
   const floorLightenHoleRoundRadius = Math.min(
     ribRadius,
-    Math.max(0, floorLightenHoleDepth / 2),
+    Math.max(0, floorLightenHoleDepth / 3),
     floorLightenCutoutMaxMin[0] / 2,
   )
   const floorLightenHoles = floorLightenHoleDepth > 0
@@ -166,8 +290,8 @@ const main = () => {
         sizeRange: floorLightenCutoutMaxMin,
         roundRadius: floorLightenHoleRoundRadius,
       }).map(({ startX, width }) => startRoundedRectangleFloorHole({
-        start: [startX, verticalWallThickness + floorLightenCutoutDeepGap, 0],
-        size: [width, floorLightenHoleDepth],
+        start: [startX, verticalWallThickness + ribRadius, 0],
+        size: [width, floorLightenHoleDepth-ribRadius/2],
         length: floorThickness,
       }))
     : []
@@ -227,11 +351,7 @@ const main = () => {
   const centerWallWidth = internalWidth - cutoutWidth * 2
   const centerWallHeight = internalHeight - floorThickness
   const wallLightenHoleHeight = centerWallHeight - floorThickness - wallLightenCutoutVerticalGap * 2
-  const wallLightenHoleRoundRadius = Math.min(
-    ribRadius,
-    // wallLightenHoleHeight / 2,
-    // wallLightenCutoutMaxMin[0] / 2,
-  )
+  const wallLightenHoleRoundRadius = ribRadius
   const wallLightenHoles = calculateLightenHoles({
     spanWidth: centerWallWidth,
     sidePadding: wallLightenCutoutHorizontalGap,
@@ -240,7 +360,7 @@ const main = () => {
     roundRadius: wallLightenHoleRoundRadius,
   }).map(({ startX, width }) => startRoundedRectangleWallHole({
     start: [cutoutWidth + startX, verticalWallThickness, wallLightenCutoutVerticalGap + floorThickness + ribRadius],
-    size: [width, wallLightenHoleHeight - ribRadius*2 -floorThickness],
+    size: [width, wallLightenHoleHeight - ribRadius * 2 -floorThickness],
     length: verticalWallThickness ,
   }))
 
@@ -264,16 +384,56 @@ const main = () => {
   }))
   
 
+  const ceilStart = [cutoutWidth, verticalWallThickness, internalHeight - floorThickness - ceilThickness]
+  const ceilSize = [
+    internalWidth - cutoutWidth * 2,
+    internalDeep - verticalWallThickness,
+    ceilThickness,
+  ]
+  const ceilSlab = startRoundedSlab({
+    start: ceilStart,
+    size: ceilSize,
+    roundedCorners: ceilRoundedCorners,
+  })
+  const supportHoles = distributeSupportHoles({
+    origin: supportHolesGridOrigin,
+    holeDim: supportHolesDimInternal,
+    reservedDim: supportHolesDim,
+    rowGap: supportHolesGap,
+    rows: supportHolesBoxRows,
+    cols: supportHolesBoxColumns,
+    colGap: supportHolesGap ,
+
+  })
+ 
+  const ceilHoles = supportHoles.map(({ centerX, centerZ, radius }) =>
+    startCeilingCylinderHole({
+      center: [
+        ceilStart[0] + centerX,
+        ceilStart[1] + centerZ,
+        ceilStart[2] + ceilThickness / 2,
+      ],
+      radius,
+      height: ceilThickness + 0.1,
+    }))
+  
+  const ceilHoleGuides = colors.colorize(
+    [1, 0.1, 0, 0.45],
+    supportHoles.map(({ centerX, centerZ }) => startCeilingCylinderHole({
+        center: [
+          ceilStart[0] + centerX,
+          ceilStart[1] + centerZ,
+          ceilStart[2] + ceilThickness + supportHolesGuideLift + supportHolesGuideHeight / 2,
+        ],
+        radius: supportHolesDim / 2,
+        height: supportHolesGuideHeight,
+      })),
+    )
+
   const ceil = colors.colorize(
     colors.colorNameToRgb('green'),
-    startCuboid({ 
-      start: [cutoutWidth, verticalWallThickness, internalHeight - floorThickness - ceilThickness], 
-      size: [
-          internalWidth - cutoutWidth * 2, 
-          internalDeep - verticalWallThickness, 
-          floorThickness
-      ] })
-    )
+    ceilHoles.length > 0 ? booleans.subtract(ceilSlab, ...ceilHoles) : ceilSlab,
+  )
 
   const ceilingRib = colors.colorize(
     colors.colorNameToRgb('yellow'),
@@ -284,7 +444,7 @@ const main = () => {
     })
 )
 
-  return [floorWithLightenHoles, wallWithCutouts, ceil, floorRib, ceilingRib]
+  return [booleans.union(floorWithLightenHoles, wallWithCutouts, ceil, floorRib, ceilingRib), ceilHoleGuides]
   //return booleans.union(floor, wall)
 }
 
