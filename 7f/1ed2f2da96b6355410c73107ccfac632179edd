@@ -1,0 +1,79 @@
+xps-support.js
+  h_f90ee31b03fc41 265,447-449
+dist/assets/styles-C1V6lklF.css
+  s_4a34b03134f32e::t_36fac175f6c074 1
+src/coasters/coasters.js
+  s_4a34b03134f32e::t_38067d811bd933 15,151-159
+  s_4a34b03134f32e::t_19e18e16a06713 2-4,21,27-28,36-37,41,46-47,50-51,63-65,67-68,71-72,90-91,94,97,101,104,109,111,113-115,128-129,141-142,146,149,176
+  h_f90ee31b03fc41 22-26,29-35,38-40,42-45,48-49,52-62,66,69-70,73-89,92-93,95-96,98-100,102-103,105-108,110,112,116-127,130-140,143-145,147-148,177-182
+  s_4a34b03134f32e::t_64aba6308a9649 6,10-12,14,16-20,150,160-167,170-171
+  s_4a34b03134f32e::t_7eb7f79cf92118 9,13,168-169
+index.html
+  s_4a34b03134f32e::t_4f2c41993cd75e 23-28
+  s_93c1ba2add9e13::t_a51a1a9807d8b4 21
+vite.config.js
+  s_4a34b03134f32e::t_e859438ec1826c 1-15
+dist/index.html
+  s_93c1ba2add9e13::t_4d27d7798cfb34 24
+  s_4a34b03134f32e::t_36fac175f6c074 7-9,26-31
+package.json
+  s_93c1ba2add9e13::t_63f1e7cee0c3e5 17
+  s_4a34b03134f32e::t_b5da3ebbb9213e 18-19
+dist/assets/coasters-Xfvou393.js
+  s_4a34b03134f32e::t_2f5a926e83806a 1-68
+dist/assets/styles-BC31X0dY.js
+  s_4a34b03134f32e::t_36fac175f6c074 1-286
+coasters.html
+  s_4a34b03134f32e::t_1386b69f59e4de 1-36
+src/coasters/main.js
+  h_f90ee31b03fc41 10
+  s_4a34b03134f32e::t_b6be6c81b836a5 2-9,51-233
+src/main.js
+  s_d64c9e17b3bef8::t_97d8404d50bf5a 91,113
+  h_f90ee31b03fc41 4,6,8,10
+  s_93c1ba2add9e13::t_a51a1a9807d8b4 14,73-90,92-110,233-235
+src/styles.css
+  s_93c1ba2add9e13::t_a51a1a9807d8b4 75-105
+dist/coasters.html
+  s_4a34b03134f32e::t_36fac175f6c074 1-6,8-38
+  s_4a34b03134f32e::t_2f5a926e83806a 7
+dist/assets/main-BG9pEB59.js
+  s_4a34b03134f32e::t_36fac175f6c074 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "7f1ed2f2da96b6355410c73107ccfac632179edd",
+  "prompts": {},
+  "humans": {
+    "h_f90ee31b03fc41": {
+      "author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    }
+  },
+  "sessions": {
+    "s_4a34b03134f32e": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "e5001114-2839-4b5c-a12c-f584f5bb56e9",
+        "model": "gpt-5-mini"
+      },
+      "human_author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    },
+    "s_93c1ba2add9e13": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "eeb6aab5-7878-4bd8-9d16-f87c5ec4672f",
+        "model": "gpt-5-mini"
+      },
+      "human_author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    },
+    "s_d64c9e17b3bef8": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "fe76d8b3-6c2d-4583-9e14-c02755fab813",
+        "model": "gpt-5-mini"
+      },
+      "human_author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    }
+  }
+}
