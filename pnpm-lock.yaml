@@ -14,6 +14,12 @@ importers:
       '@jscad/regl-renderer':
         specifier: ^2.6.15
         version: 2.6.15
+      '@jscad/stl-serializer':
+        specifier: ^2.1.23
+        version: 2.1.23
+      '@jscad/svg-deserializer':
+        specifier: ^2.5.14
+        version: 2.5.14
     devDependencies:
       vite:
         specifier: ^8.0.12
@@ -33,11 +39,20 @@ packages:
   '@jscad/array-utils@2.1.4':
     resolution: {integrity: sha512-c31r4zSKsE+4Xfwk2V8monDA0hx5G89QGzaakWVUvuGNowYS9WSsYCwHiTIXodjR+HEnDu4okQ7k/whmP0Ne2g==}
 
+  '@jscad/io-utils@2.0.33':
+    resolution: {integrity: sha512-Hiul/9FAyLSgHeJHqjIxu2ImNDiafkQNGONkKjhj/StsEKWQ7awQg/XjqC6JyhtWe5LY8IFW/As0YgmUVYCdgQ==}
+
   '@jscad/modeling@2.13.0':
     resolution: {integrity: sha512-Thv/JJZZOMzQ9rfhP+75PbgrNbBTZduRL+ClaGfGFts9+JdIXcUueqRL3NtZZ/v/hyZCUBkPSRxHIi4icz04tQ==}
 
   '@jscad/regl-renderer@2.6.15':
     resolution: {integrity: sha512-skjI+ZAgEHBFwHF2cmWaDZXGvaCGbRRMGr7ua7ZoZB67Vh5DlpdqV/7rAIPyWWE/8pGsUrxjqSm3TUOeLxzg+w==}
+
+  '@jscad/stl-serializer@2.1.23':
+    resolution: {integrity: sha512-bSaz2hte30ig2kT1ogBQIjQVGD0Nu1dDyQ4q+fHBFKKmJ8A7ximnFZj7hgQegm3XUD6pSE5KwzPWspCyRWQ5kA==}
+
+  '@jscad/svg-deserializer@2.5.14':
+    resolution: {integrity: sha512-kZSIa6zrzBjfKRGJoWVmlv9dwMQ4vE1yGC+UajY7JMg9rVTLjNJcgt/qeRuvnMDI+KW5ID52IEvZcVVRZbYKWw==}
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -264,6 +279,10 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
+  saxes@5.0.1:
+    resolution: {integrity: sha512-5LBh1Tls8c9xgGjw3QrMwETmTMVk0oFgvrFSvWx62llR2hcEInrKNZ2GZCCuuy2lvWrdl5jhbpeqc5hRYKFOcw==}
+    engines: {node: '>=10'}
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -318,6 +337,9 @@ packages:
       yaml:
         optional: true
 
+  xmlchars@2.2.0:
+    resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
+
 snapshots:
 
   '@emnapi/core@1.10.0':
@@ -338,6 +360,8 @@ snapshots:
 
   '@jscad/array-utils@2.1.4': {}
 
+  '@jscad/io-utils@2.0.33': {}
+
   '@jscad/modeling@2.13.0': {}
 
   '@jscad/regl-renderer@2.6.15':
@@ -347,6 +371,18 @@ snapshots:
       gl-mat4: 1.2.0
       gl-vec3: 1.1.3
       regl: 2.1.0
+
+  '@jscad/stl-serializer@2.1.23':
+    dependencies:
+      '@jscad/array-utils': 2.1.4
+      '@jscad/modeling': 2.13.0
+
+  '@jscad/svg-deserializer@2.5.14':
+    dependencies:
+      '@jscad/array-utils': 2.1.4
+      '@jscad/io-utils': 2.0.33
+      '@jscad/modeling': 2.13.0
+      saxes: 5.0.1
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
@@ -512,6 +548,10 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.0.0
       '@rolldown/binding-win32-x64-msvc': 1.0.0
 
+  saxes@5.0.1:
+    dependencies:
+      xmlchars: 2.2.0
+
   source-map-js@1.2.1: {}
 
   tinyglobby@0.2.16:
@@ -531,3 +571,5 @@ snapshots:
       tinyglobby: 0.2.16
     optionalDependencies:
       fsevents: 2.3.3
+
+  xmlchars@2.2.0: {}

@@ -72,6 +72,37 @@ h1 {
   margin-top: 8px;
 }
 
+.action-button {
+  width: 100%;
+  margin: 0 0 16px;
+  padding: 14px 18px;
+  border: 1px solid rgba(125, 178, 255, 0.28);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7db2ff, #4f8dff);
+  color: #08111f;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+  box-shadow: 0 12px 28px rgba(79, 141, 255, 0.24);
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 34px rgba(79, 141, 255, 0.3);
+}
+
+.action-button:active {
+  transform: translateY(0);
+}
+
+.action-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+  box-shadow: 0 10px 20px rgba(79, 141, 255, 0.18);
+}
+
 .status {
   overflow: auto;
   margin: 0;

@@ -262,7 +262,7 @@ const startCeilingCylinderHole = ({ center, radius, height }) => primitives.cyli
 })
 
 
-const main = () => {
+const main = ({ includeGuides = true } = {}) => {
     // Floor
   const floor = startRoundedSlab({ 
     start: [0, verticalWallThickness, 0], 
@@ -444,7 +444,9 @@ const main = () => {
     })
 )
 
-  return [booleans.union(floorWithLightenHoles, wallWithCutouts, ceil, floorRib, ceilingRib), ceilHoleGuides]
+  const printableSolid = booleans.union(floorWithLightenHoles, wallWithCutouts, ceil, floorRib, ceilingRib)
+
+  return includeGuides ? [printableSolid, ...ceilHoleGuides] : [printableSolid]
   //return booleans.union(floor, wall)
 }
 

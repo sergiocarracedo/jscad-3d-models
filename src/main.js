@@ -1,15 +1,17 @@
-import './styles.css'
 import {
-  prepareRender,
-  drawCommands,
   cameras,
   controls,
+  drawCommands,
   entitiesFromSolids,
+  prepareRender,
 } from '@jscad/regl-renderer'
+import { serialize as serializeStl, mimeType as stlMimeType } from '@jscad/stl-serializer'
 import { main as initialMain } from '../xps-support.js'
+import './styles.css'
 
 const viewerElement = document.querySelector('#viewer')
 const statusElement = document.querySelector('#status')
+const exportButton = document.querySelector('#export-stl')
 
 const perspectiveCamera = cameras.perspective
 const orbitControls = controls.orbit
@@ -68,9 +70,47 @@ const getSolids = (result) => {
   return [result]
 }
 
+const downloadBlob = ({ blob, fileName }) => {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.href = url
+  link.download = fileName
+  link.click()
+
+  window.setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
+const exportCurrentModelAsStl = async () => {
+  if (!exportButton) return
+
+  exportButton.disabled = true
+  exportButton.textContent = 'Exporting...'
+
+  try {
+    const solids = getSolids(currentMain({ includeGuides: false }))
+
+    if (solids.length === 0) {
+      statusElement.textContent = 'Nothing to export.'
+      return
+    }
+
+    const stlChunks = serializeStl({ binary: true }, ...solids)
+    const blob = new Blob(stlChunks, { type: stlMimeType })
+
+    downloadBlob({ blob, fileName: 'xps-support.stl' })
+    statusElement.textContent = `Exported ${solids.length} solid${solids.length === 1 ? '' : 's'} to STL`
+  } catch (error) {
+    statusElement.textContent = error instanceof Error ? error.stack ?? error.message : String(error)
+  } finally {
+    exportButton.disabled = false
+    exportButton.textContent = 'Export STL'
+  }
+}
+
 const renderModel = () => {
   try {
-    const solids = getSolids(currentMain())
+    const solids = getSolids(currentMain({ includeGuides: true }))
     const solidEntities = entitiesFromSolids({}, solids)
     renderOptions.entities = [grid, axis, ...solidEntities]
 
@@ -189,6 +229,10 @@ window.addEventListener('resize', resizeCamera)
 resizeCamera()
 renderModel()
 window.requestAnimationFrame(updateControls)
+
+exportButton?.addEventListener('click', () => {
+  void exportCurrentModelAsStl()
+})
 
 if (import.meta.hot) {
   import.meta.hot.accept('../xps-support.js', (module) => {

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coasters - Los Más Guapos</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="panel">
+        <p class="eyebrow">OpenJSCAD</p>
+        <h1>Coasters</h1>
+        <p class="description">
+          Edit <code>src/coasters/coasters.js</code> and the viewer updates in real time.
+        </p>
+        <div class="help">
+          <p><strong>Orbit</strong>: drag</p>
+          <p><strong>Pan</strong>: shift + drag</p>
+          <p><strong>Zoom</strong>: mouse wheel</p>
+        </div>
+        <button id="export-stl" class="action-button" type="button">Export STL</button>
+        <pre id="status" class="status">Rendering model...</pre>
+        <hr style="margin: 24px 0; border: none; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <nav style="margin-top: 12px;">
+          <p style="font-size: 0.75rem; color: #7db2ff; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.12em;">Projects</p>
+          <a href="/" style="display: block; padding: 8px 0; color: #f2f4f8; text-decoration: none; font-size: 0.9rem;">XPS Support</a>
+          <a href="/coasters" style="display: block; padding: 8px 0; color: #7db2ff; font-weight: 600; text-decoration: none; font-size: 0.9rem;">Coasters</a>
+        </nav>
+      </aside>
+      <main class="viewer-wrap">
+        <div id="viewer" class="viewer"></div>
+      </main>
+    </div>
+    <script type="module" src="/src/coasters/main.js"></script>
+  </body>
+</html>
