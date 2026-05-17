@@ -1,0 +1,60 @@
+src/models/xps-support.js
+  h_f90ee31b03fc41 2,6-10,386,433
+dist/assets/index-Dsj_jrK3.js
+  s_9a4f20330d0f2d::t_04c01c4225613e 1-354
+src/utils/rounded-corners.js
+  h_f90ee31b03fc41 1-114
+src/styles.css
+  s_9a4f20330d0f2d::t_a954a6116b884a 59-103
+  s_4d22fd7173b70b::t_5e0f0624900bb7 165,176-211
+src/utils/shape-helpers.js
+  h_f90ee31b03fc41 1-31
+src/models/hyperx.js
+  h_f90ee31b03fc41 1-141
+src/main.js
+  s_9a4f20330d0f2d::t_a954a6116b884a 8-16,22-25,61-64,98-105,107,113,123,126,136,153,214-263,265-286,329-350,352-355
+  h_f90ee31b03fc41 127,154,201,264
+dist/assets/index-CdazfRWl.css
+  s_9a4f20330d0f2d::t_04c01c4225613e 1
+dist/index.html
+  s_9a4f20330d0f2d::t_04c01c4225613e 6-8,14-16,18-20
+index.html
+  s_9a4f20330d0f2d::t_a954a6116b884a 6,12-14,16-18
+  s_4d22fd7173b70b::t_2a7e84f58ff483 31-35
+src/models/coasters.js
+  s_9a4f20330d0f2d::t_61192fd810f781 17-20
+  h_f90ee31b03fc41 3-4,13,39,274,294,371,375
+src/models/index.js
+  h_f90ee31b03fc41 1-78
+vite.config.js
+  s_9a4f20330d0f2d::t_a954a6116b884a 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "a5592476e4c0388da2d6861aebc5460a3118e8e2",
+  "prompts": {},
+  "humans": {
+    "h_f90ee31b03fc41": {
+      "author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    }
+  },
+  "sessions": {
+    "s_4d22fd7173b70b": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "7801b558-84ea-4203-850f-6adf58781668",
+        "model": "gpt-5-mini"
+      },
+      "human_author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    },
+    "s_9a4f20330d0f2d": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "4caa86ee-e5ff-427c-a25b-6fec7e9830f7",
+        "model": "gpt-5-mini"
+      },
+      "human_author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    }
+  }
+}
