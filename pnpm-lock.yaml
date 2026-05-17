@@ -20,6 +20,12 @@ importers:
       '@jscad/svg-deserializer':
         specifier: ^2.5.14
         version: 2.5.14
+      svg-path-properties:
+        specifier: ^2.0.2
+        version: 2.0.2
+      svg-pathdata:
+        specifier: ^9.0.0
+        version: 9.0.0
     devDependencies:
       vite:
         specifier: ^8.0.12
@@ -287,6 +293,14 @@ packages:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
 
+  svg-path-properties@2.0.2:
+    resolution: {integrity: sha512-NsSMBNZmod9Gr22gxa8FOiZUIzrI8o65veuCyppoNftNfpKjP5qoouA3ZyioOsQ2a4O8cRV8rHmG9LZF2HhXvw==}
+    engines: {node: '>=22.0.0'}
+
+  svg-pathdata@9.0.0:
+    resolution: {integrity: sha512-h9FuqmNsgDKq2hQBqTMOWjZwqdZOnWijZmcg6FL4iSmH6VvRnobhHrBQSdOiP0W9nwgv0qiW5vQ3//Arrmp19g==}
+    engines: {node: '>=24.14.0'}
+
   tinyglobby@0.2.16:
     resolution: {integrity: sha512-pn99VhoACYR8nFHhxqix+uvsbXineAasWm5ojXoN8xEwK5Kd3/TrhNn1wByuD52UxWRLy8pu+kRMniEi6Eq9Zg==}
     engines: {node: '>=12.0.0'}
@@ -553,6 +567,10 @@ snapshots:
       xmlchars: 2.2.0
 
   source-map-js@1.2.1: {}
+
+  svg-path-properties@2.0.2: {}
+
+  svg-pathdata@9.0.0: {}
 
   tinyglobby@0.2.16:
     dependencies:
