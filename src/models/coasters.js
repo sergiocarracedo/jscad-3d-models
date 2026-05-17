@@ -1,10 +1,22 @@
 import modeling from '@jscad/modeling'
-import coasterSvgRaw from '../../losmasguarros-coaster/coasters.svg?raw'
-import { SVGPathData } from 'svg-pathdata'
 import { svgPathProperties } from 'svg-path-properties'
+import { SVGPathData } from 'svg-pathdata'
+import coasterSvgRaw from '../../losmasguarros-coaster/coasters.svg?raw'
 
-const { booleans, colors, extrusions, geometries, measurements, primitives, transforms } = modeling
+const {
+  booleans,
+  colors,
+  extrusions,
+  geometries,
+  measurements,
+  primitives,
+  transforms,
+} = modeling
 const { geom2 } = geometries
+
+export const id = 'coasters'
+export const title = 'Coasters'
+export const exportFileName = 'coasters.stl'
 
 // SVG dimensions from viewBox="0 0 575 575"
 const svgWidth = 575
@@ -22,7 +34,10 @@ const engravingDepthMm = 1.1
 // Scale from SVG units to real millimeters based on requested diameter.
 const sourceDiameterSvg = Math.max(sourceRadiusX * 2, sourceRadiusY * 2)
 const mmPerSvgUnit = coasterDiameterMm / sourceDiameterSvg
-const safeEngravingDepth = Math.max(0.2, Math.min(engravingDepthMm, coasterThicknessMm - 0.2))
+const safeEngravingDepth = Math.max(
+  0.2,
+  Math.min(engravingDepthMm, coasterThicknessMm - 0.2),
+)
 const curveSamplingStepSvg = 0.75
 
 const svgToModel = (x, y) => [
@@ -76,14 +91,21 @@ const dedupePoints = (points, eps = 1e-4) => {
   const out = []
   for (const p of points) {
     const prev = out[out.length - 1]
-    if (!prev || Math.abs(prev[0] - p[0]) > eps || Math.abs(prev[1] - p[1]) > eps) {
+    if (
+      !prev ||
+      Math.abs(prev[0] - p[0]) > eps ||
+      Math.abs(prev[1] - p[1]) > eps
+    ) {
       out.push(p)
     }
   }
   if (out.length > 1) {
     const first = out[0]
     const last = out[out.length - 1]
-    if (Math.abs(first[0] - last[0]) <= eps && Math.abs(first[1] - last[1]) <= eps) {
+    if (
+      Math.abs(first[0] - last[0]) <= eps &&
+      Math.abs(first[1] - last[1]) <= eps
+    ) {
       out.pop()
     }
   }
@@ -245,7 +267,12 @@ const rasterRunsToRectangles = ({ runsByRow, cellSize }) => {
   }
 
   for (const state of active.values()) {
-    rects.push({ x1: state.x1, x2: state.x2, y1: state.yStart, y2: runsByRow.length })
+    rects.push({
+      x1: state.x1,
+      x2: state.x2,
+      y1: state.yStart,
+      y2: runsByRow.length,
+    })
   }
 
   return rects
@@ -262,13 +289,17 @@ const rasterRunsToRectangles = ({ runsByRow, cellSize }) => {
       const height = (svgY2 - svgY1) * mmPerSvgUnit
 
       if (width <= 0 || height <= 0) return null
-      return transforms.translate([mx, my], primitives.rectangle({ size: [width, height], center: [0, 0] }))
+      return transforms.translate(
+        [mx, my],
+        primitives.rectangle({ size: [width, height], center: [0, 0] }),
+      )
     })
     .filter(Boolean)
 }
 
 const createRasterFallbackDetail2D = (pathData) => {
-  if (typeof document === 'undefined' || typeof Path2D === 'undefined') return null
+  if (typeof document === 'undefined' || typeof Path2D === 'undefined')
+    return null
 
   const canvas = document.createElement('canvas')
   canvas.width = svgWidth
@@ -335,12 +366,19 @@ const engraveWithShapes = (base, detailShapes2d) => {
   if (!detailShapes2d || detailShapes2d.length === 0) return base
 
   const engravingTools = detailShapes2d.map((detail2d) => {
-    const tool = extrusions.extrudeLinear({ height: safeEngravingDepth }, detail2d)
-    return transforms.translate([0, 0, coasterThicknessMm - safeEngravingDepth], tool)
+    const tool = extrusions.extrudeLinear(
+      { height: safeEngravingDepth },
+      detail2d,
+    )
+    return transforms.translate(
+      [0, 0, coasterThicknessMm - safeEngravingDepth],
+      tool,
+    )
   })
 
   let engraved = base
-  for (const tool of engravingTools) engraved = booleans.subtract(engraved, tool)
+  for (const tool of engravingTools)
+    engraved = booleans.subtract(engraved, tool)
   return engraved
 }
 
@@ -349,8 +387,13 @@ const isRenderableSolid = (solid) => {
     const [min, max] = measurements.measureBoundingBox(solid)
     const dims = [max[0] - min[0], max[1] - min[1], max[2] - min[2]]
     if (dims.some((d) => !Number.isFinite(d) || d <= 0)) return false
-    if (dims[0] > coasterDiameterMm * 4 || dims[1] > coasterDiameterMm * 4) return false
-    if (dims[0] < coasterDiameterMm * 0.25 || dims[1] < coasterDiameterMm * 0.25) return false
+    if (dims[0] > coasterDiameterMm * 4 || dims[1] > coasterDiameterMm * 4)
+      return false
+    if (
+      dims[0] < coasterDiameterMm * 0.25 ||
+      dims[1] < coasterDiameterMm * 0.25
+    )
+      return false
     return true
   } catch {
     return false

@@ -1,6 +1,12 @@
 import modeling from '@jscad/modeling'
+import { startCuboid, startRoundedSlab } from '../utils/shape-helpers'
 
 const { booleans, colors, extrusions, primitives, transforms } = modeling
+
+const id = 'xps-support'
+const title = 'XPS Support'
+const exportFileName = 'xps-support.stl'
+const supportsIncludeGuides = true
 
 const wallThickness = 3
 const floorThickness = 3
@@ -45,142 +51,6 @@ const floorLightenCutoutMaxMin = [20, 50]
 
 const floorRoundedCorners = ['back-left', 'back-right']
 const ceilRoundedCorners = ['back-left', 'back-right']
-
-const startCuboid = (params) => {
-  const { start, size } = params
-  // Calculamos el centro basado en el inicio y el tamaño
-  const center = [
-    start[0] + size[0] / 2,
-    start[1] + size[1] / 2,
-    start[2] + size[2] / 2,
-  ]
-  return primitives.cuboid({ ...params, size, center })
-}
-
-const allRoundedCorners = [
-  'front-left',
-  'front-right',
-  'back-right',
-  'back-left',
-]
-
-const normalizeRoundedCorners = (roundedCorners) => {
-  if (roundedCorners === 'all') return new Set(allRoundedCorners)
-  if (Array.isArray(roundedCorners)) {
-    return new Set(
-      roundedCorners.filter((corner) => allRoundedCorners.includes(corner)),
-    )
-  }
-
-  return new Set()
-}
-
-const addArcPoints = (points, center, radius, startAngle, endAngle) => {
-  for (let index = 1; index <= ribSegments; index += 1) {
-    const ratio = index / ribSegments
-    const angle = startAngle + (endAngle - startAngle) * ratio
-
-    points.push([
-      center[0] + radius * Math.cos(angle),
-      center[1] + radius * Math.sin(angle),
-    ])
-  }
-}
-
-const selectiveRoundedRectanglePoints = ({
-  width,
-  depth,
-  radius,
-  roundedCorners,
-}) => {
-  const corners = normalizeRoundedCorners(roundedCorners)
-  const effectiveRadius = Math.min(radius, width / 2, depth / 2)
-
-  if (effectiveRadius <= 0 || corners.size === 0) {
-    return [
-      [0, 0],
-      [width, 0],
-      [width, depth],
-      [0, depth],
-    ]
-  }
-
-  const points = []
-  const frontLeftRounded = corners.has('front-left')
-  const frontRightRounded = corners.has('front-right')
-  const backRightRounded = corners.has('back-right')
-  const backLeftRounded = corners.has('back-left')
-
-  points.push(frontLeftRounded ? [effectiveRadius, 0] : [0, 0])
-  points.push(frontRightRounded ? [width - effectiveRadius, 0] : [width, 0])
-
-  if (frontRightRounded) {
-    addArcPoints(
-      points,
-      [width - effectiveRadius, effectiveRadius],
-      effectiveRadius,
-      -Math.PI / 2,
-      0,
-    )
-  }
-
-  points.push(
-    backRightRounded ? [width, depth - effectiveRadius] : [width, depth],
-  )
-
-  if (backRightRounded) {
-    addArcPoints(
-      points,
-      [width - effectiveRadius, depth - effectiveRadius],
-      effectiveRadius,
-      0,
-      Math.PI / 2,
-    )
-  }
-
-  points.push(backLeftRounded ? [effectiveRadius, depth] : [0, depth])
-
-  if (backLeftRounded) {
-    addArcPoints(
-      points,
-      [effectiveRadius, depth - effectiveRadius],
-      effectiveRadius,
-      Math.PI / 2,
-      Math.PI,
-    )
-  }
-
-  points.push(frontLeftRounded ? [0, effectiveRadius] : [0, 0])
-
-  if (frontLeftRounded) {
-    addArcPoints(
-      points,
-      [effectiveRadius, effectiveRadius],
-      effectiveRadius,
-      Math.PI,
-      Math.PI * 1.5,
-    )
-  }
-
-  return points
-}
-
-const startRoundedSlab = (params) => {
-  const { start, size, roundedCorners = 'all' } = params
-  const [width, depth, height] = size
-  const roundRadius = Math.min(borderRadius, width / 2, depth / 2)
-  const profile = primitives.polygon({
-    points: selectiveRoundedRectanglePoints({
-      width,
-      depth,
-      radius: roundRadius,
-      roundedCorners,
-    }),
-  })
-  const slab = extrusions.extrudeLinear({ height }, profile)
-
-  return transforms.translate(start, slab)
-}
 
 const quarterCircleProfilePoints = ({ radius, horizontalDirection }) => {
   const points = [
@@ -415,7 +285,6 @@ const main = ({ includeGuides = true } = {}) => {
     wallLightenCutoutVerticalGap * 2 -
     ribRadiusBottom -
     ribRadiusTop
-  console.log(wallLightenHoleHeight, wallLightenCutoutVerticalGap)
   const wallLightenHoleRoundRadius = wallLightenCutoutRadius
   const wallLightenHoles = calculateLightenHoles({
     spanWidth: centerWallWidth,
@@ -481,7 +350,6 @@ const main = ({ includeGuides = true } = {}) => {
     rowGap,
     colGap,
   }) => {
-    console.log(origin, holeDim, reservedDim, rows, cols, rowGap, colGap)
     const res = []
     for (let row = 0; row < rows; row += 1) {
       for (let col = colsStartOn; col < cols; col += 1) {
@@ -489,9 +357,6 @@ const main = ({ includeGuides = true } = {}) => {
           origin.x + col * (reservedDim + colGap) + reservedDim / 2
         const centerZ =
           origin.z + row * (reservedDim + rowGap) + reservedDim / 2
-        console.log(
-          `Hole at row ${row}, col ${col}: centerX=${centerX}, centerZ=${centerZ}`,
-        )
         res.push({ centerX, centerZ, radius: holeDim / 2 })
       }
     }
@@ -509,9 +374,8 @@ const main = ({ includeGuides = true } = {}) => {
     colGap: supportHolesGap,
   })
 
-  const ceilHoles = supportHoles.map(({ centerX, centerZ, radius }) => {
-    console.log(`ceilStart[0]: ${(ceilStart[0], centerX)}`)
-    return startCeilingCylinderHole({
+  const ceilHoles = supportHoles.map(({ centerX, centerZ, radius }) =>
+    startCeilingCylinderHole({
       center: [
         ceilStart[0] + centerX,
         ceilStart[1] + centerZ,
@@ -519,8 +383,8 @@ const main = ({ includeGuides = true } = {}) => {
       ],
       radius,
       height: ceilThickness + 0.1,
-    })
-  })
+    }),
+  )
 
   const ceilHoleGuides = colors.colorize(
     [1, 0.1, 0, 0.45],
@@ -564,7 +428,6 @@ const main = ({ includeGuides = true } = {}) => {
   )
 
   return includeGuides ? [printableSolid, ...ceilHoleGuides] : [printableSolid]
-  //return booleans.union(floor, wall)
 }
 
-export { main }
+export { exportFileName, id, main, supportsIncludeGuides, title }

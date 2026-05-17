@@ -3,19 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>XPS Support</title>
-    <script type="module" crossorigin src="/assets/main-BG9pEB59.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/styles-BC31X0dY.js">
-    <link rel="stylesheet" crossorigin href="/assets/styles-C1V6lklF.css">
+    <title>3D Model Viewer</title>
+    <script type="module" crossorigin src="/assets/index-Dsj_jrK3.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CdazfRWl.css">
   </head>
   <body>
     <div class="app-shell">
       <aside class="panel">
         <p class="eyebrow">OpenJSCAD</p>
-        <h1>XPS Support</h1>
-        <p class="description">
-          Edit <code>xps-support.js</code> and the viewer updates in real time.
+        <h1 id="model-title">Model Viewer</h1>
+        <p class="description" id="model-description">
+          Edit <code>src/models/*.js</code> and the viewer updates in real time.
         </p>
+        <label class="field-label" for="model-select">Model</label>
+        <select id="model-select" class="model-select"></select>
+        <nav id="model-list" class="model-list"></nav>
         <div class="help">
           <p><strong>Orbit</strong>: drag</p>
           <p><strong>Pan</strong>: shift + drag</p>
@@ -23,12 +25,6 @@
         </div>
         <button id="export-stl" class="action-button" type="button">Export STL</button>
         <pre id="status" class="status">Rendering model...</pre>
-        <hr style="margin: 24px 0; border: none; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-        <nav style="margin-top: 12px;">
-          <p style="font-size: 0.75rem; color: #7db2ff; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.12em;">Projects</p>
-          <a href="/" style="display: block; padding: 8px 0; color: #7db2ff; font-weight: 600; text-decoration: none; font-size: 0.9rem;">XPS Support</a>
-          <a href="/coasters" style="display: block; padding: 8px 0; color: #f2f4f8; text-decoration: none; font-size: 0.9rem;">Coasters</a>
-        </nav>
       </aside>
       <main class="viewer-wrap">
         <div id="viewer" class="viewer"></div>

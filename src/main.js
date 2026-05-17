@@ -5,13 +5,24 @@ import {
   entitiesFromSolids,
   prepareRender,
 } from '@jscad/regl-renderer'
-import { serialize as serializeStl, mimeType as stlMimeType } from '@jscad/stl-serializer'
-import { main as initialMain } from '../xps-support.js'
+import {
+  serialize as serializeStl,
+  mimeType as stlMimeType,
+} from '@jscad/stl-serializer'
+import {
+  getDefaultModelId,
+  getModelById,
+  getModelList,
+} from './models/index.js'
 import './styles.css'
 
 const viewerElement = document.querySelector('#viewer')
 const statusElement = document.querySelector('#status')
 const exportButton = document.querySelector('#export-stl')
+const modelTitleElement = document.querySelector('#model-title')
+const modelDescriptionElement = document.querySelector('#model-description')
+const modelSelectElement = document.querySelector('#model-select')
+const modelListElement = document.querySelector('#model-list')
 
 const perspectiveCamera = cameras.perspective
 const orbitControls = controls.orbit
@@ -47,7 +58,10 @@ const renderOptions = {
   entities: [grid, axis],
 }
 
-let currentMain = initialMain
+const MODEL_QUERY_PARAM = 'model'
+
+let currentModel = null
+let currentMain = null
 let needsRender = true
 let rotateDelta = [0, 0]
 let panDelta = [0, 0]
@@ -81,14 +95,22 @@ const downloadBlob = ({ blob, fileName }) => {
   window.setTimeout(() => URL.revokeObjectURL(url), 0)
 }
 
+const executeCurrentMain = ({ includeGuides }) => {
+  if (!currentMain || !currentModel) return []
+  if (currentModel.supportsIncludeGuides) {
+    return currentMain({ includeGuides })
+  }
+  return currentMain()
+}
+
 const exportCurrentModelAsStl = async () => {
-  if (!exportButton) return
+  if (!exportButton || !currentModel) return
 
   exportButton.disabled = true
   exportButton.textContent = 'Exporting...'
 
   try {
-    const solids = getSolids(currentMain({ includeGuides: false }))
+    const solids = getSolids(executeCurrentMain({ includeGuides: false }))
 
     if (solids.length === 0) {
       statusElement.textContent = 'Nothing to export.'
@@ -98,10 +120,11 @@ const exportCurrentModelAsStl = async () => {
     const stlChunks = serializeStl({ binary: true }, ...solids)
     const blob = new Blob(stlChunks, { type: stlMimeType })
 
-    downloadBlob({ blob, fileName: 'xps-support.stl' })
+    downloadBlob({ blob, fileName: currentModel.exportFileName })
     statusElement.textContent = `Exported ${solids.length} solid${solids.length === 1 ? '' : 's'} to STL`
   } catch (error) {
-    statusElement.textContent = error instanceof Error ? error.stack ?? error.message : String(error)
+    statusElement.textContent =
+      error instanceof Error ? (error.stack ?? error.message) : String(error)
   } finally {
     exportButton.disabled = false
     exportButton.textContent = 'Export STL'
@@ -110,7 +133,7 @@ const exportCurrentModelAsStl = async () => {
 
 const renderModel = () => {
   try {
-    const solids = getSolids(currentMain({ includeGuides: true }))
+    const solids = getSolids(executeCurrentMain({ includeGuides: true }))
     const solidEntities = entitiesFromSolids({}, solids)
     renderOptions.entities = [grid, axis, ...solidEntities]
 
@@ -127,7 +150,8 @@ const renderModel = () => {
     statusElement.textContent = `Rendered ${solids.length} solid${solids.length === 1 ? '' : 's'}`
     needsRender = true
   } catch (error) {
-    statusElement.textContent = error instanceof Error ? error.stack ?? error.message : String(error)
+    statusElement.textContent =
+      error instanceof Error ? (error.stack ?? error.message) : String(error)
   }
 }
 
@@ -172,7 +196,10 @@ const updateControls = () => {
   }
 
   if (needsRender) {
-    const updated = orbitControls.update({ controls: state.controls, camera: state.camera })
+    const updated = orbitControls.update({
+      controls: state.controls,
+      camera: state.camera,
+    })
     state.controls = { ...state.controls, ...updated.controls }
     state.camera.position = updated.camera.position
     state.camera.view = updated.camera.view
@@ -182,6 +209,79 @@ const updateControls = () => {
   }
 
   window.requestAnimationFrame(updateControls)
+}
+
+const getModelIdFromUrl = () => {
+  const params = new URLSearchParams(window.location.search)
+  return params.get(MODEL_QUERY_PARAM)
+}
+
+const setModelIdInUrl = ({ modelId, replaceHistory = false }) => {
+  const url = new URL(window.location.href)
+  url.searchParams.set(MODEL_QUERY_PARAM, modelId)
+
+  if (replaceHistory) {
+    window.history.replaceState({ modelId }, '', url)
+    return
+  }
+
+  window.history.pushState({ modelId }, '', url)
+}
+
+const updateModelChooserUi = ({ activeModelId }) => {
+  const models = getModelList()
+
+  if (modelSelectElement) {
+    modelSelectElement.innerHTML = models
+      .map((model) => {
+        const selected = model.id === activeModelId ? ' selected' : ''
+        return `<option value="${model.id}"${selected}>${model.title}</option>`
+      })
+      .join('')
+  }
+
+  if (modelListElement) {
+    modelListElement.innerHTML = models
+      .map((model) => {
+        const activeClass = model.id === activeModelId ? ' is-active' : ''
+        return `<button type="button" class="model-link${activeClass}" data-model-id="${model.id}">${model.title}</button>`
+      })
+      .join('')
+  }
+}
+
+const updateModelCopy = ({ model }) => {
+  if (modelTitleElement) modelTitleElement.textContent = model.title
+
+  if (modelDescriptionElement) {
+    modelDescriptionElement.innerHTML = `Edit <code>src/models/${model.id}.js</code> and the viewer updates in real time.`
+  }
+}
+
+const switchToModel = ({
+  requestedModelId,
+  replaceHistory = false,
+  skipUrlUpdate = false,
+}) => {
+  const fallbackId = getDefaultModelId()
+  const nextModel = getModelById(requestedModelId) ?? getModelById(fallbackId)
+
+  if (!nextModel) {
+    statusElement.textContent = 'No models found in src/models.'
+    return
+  }
+
+  currentModel = nextModel
+  currentMain = nextModel.main
+
+  updateModelChooserUi({ activeModelId: nextModel.id })
+  updateModelCopy({ model: nextModel })
+
+  if (!skipUrlUpdate) {
+    setModelIdInUrl({ modelId: nextModel.id, replaceHistory })
+  }
+
+  renderModel()
 }
 
 viewerElement.addEventListener('pointerdown', (event) => {
@@ -226,18 +326,35 @@ viewerElement.addEventListener(
 
 window.addEventListener('resize', resizeCamera)
 
+modelSelectElement?.addEventListener('change', (event) => {
+  const modelId = event.target.value
+  switchToModel({ requestedModelId: modelId })
+})
+
+modelListElement?.addEventListener('click', (event) => {
+  const target = event.target
+  if (!(target instanceof HTMLButtonElement)) return
+
+  const modelId = target.dataset.modelId
+  if (!modelId) return
+
+  switchToModel({ requestedModelId: modelId })
+})
+
+window.addEventListener('popstate', () => {
+  switchToModel({
+    requestedModelId: getModelIdFromUrl(),
+    skipUrlUpdate: true,
+  })
+})
+
 resizeCamera()
-renderModel()
+switchToModel({
+  requestedModelId: getModelIdFromUrl(),
+  replaceHistory: true,
+})
 window.requestAnimationFrame(updateControls)
 
 exportButton?.addEventListener('click', () => {
   void exportCurrentModelAsStl()
 })
-
-if (import.meta.hot) {
-  import.meta.hot.accept('../xps-support.js', (module) => {
-    if (!module?.main) return
-    currentMain = module.main
-    renderModel()
-  })
-}
