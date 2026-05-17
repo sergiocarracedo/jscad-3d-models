@@ -1,0 +1,49 @@
+xps-support.js
+  s_9b982a4ddec406::t_38c210f0a54a66 473
+  h_f90ee31b03fc41 5-9,11,15,18-19,21,23,25,30-31,33-34,40,55,64,71,94,104,123,128,137,149,161,188,207,210-211,224,228-229,240,244-245,260,270,274,291,306,318-324,329-330,334-335,338,352-353,355,361-362,367-368,371,373-374,379,383-384,391-392,394,399-400,405-406,410,414-419,430-431,434-435,452,454-456,459-462,465,474-484,487,489,491,493,496,498,500,508,511-514,523-524,539,551,554-555,563
+package.json
+  s_4a34b03134f32e::t_b8fbcad59d72fb 19-21
+  s_9b982a4ddec406::t_547816f594cfe1 24
+dist/assets/coasters-Dpt-f04w.js
+  s_4a34b03134f32e::t_104331e1b717b1 1-69
+src/coasters/coasters.js
+  s_4a34b03134f32e::t_7617e2009305c8 3-4,7,26,40-57,75-161,163-171,204-209,325-329,331
+  h_f90ee31b03fc41 58-74,162,172-203,301,321,323
+  s_4a34b03134f32e::t_e6c2b9b6ceb5f0 376-377,387
+  s_4a34b03134f32e::t_f5ca3c160e02cd 379-382,385-386,388-391
+  s_4a34b03134f32e::t_4e054283a83a77 6,240-241,270,318-320,334-340,342-357
+  s_4a34b03134f32e::t_fb6577774ebb12 12-25,361-363,370
+dist/coasters.html
+  s_4a34b03134f32e::t_104331e1b717b1 7
+.vscode/settings.json
+  s_9b982a4ddec406::t_076cf7c0dc429f 4,7,10,13,16,19,22,25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "9cd37d83f30e5a9947e5c7a8ddf012362fc838c0",
+  "prompts": {},
+  "humans": {
+    "h_f90ee31b03fc41": {
+      "author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    }
+  },
+  "sessions": {
+    "s_4a34b03134f32e": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "e5001114-2839-4b5c-a12c-f584f5bb56e9",
+        "model": "gpt-5-mini"
+      },
+      "human_author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    },
+    "s_9b982a4ddec406": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "ed0a13ae-2793-4425-afa3-cc9c871db601",
+        "model": "gpt-5-mini"
+      },
+      "human_author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    }
+  }
+}
