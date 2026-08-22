@@ -19,6 +19,7 @@ import './styles.css'
 const viewerElement = document.querySelector('#viewer')
 const statusElement = document.querySelector('#status')
 const exportButton = document.querySelector('#export-stl')
+const resetCameraButton = document.querySelector('#reset-camera')
 const modelTitleElement = document.querySelector('#model-title')
 const modelDescriptionElement = document.querySelector('#model-description')
 const modelSelectElement = document.querySelector('#model-select')
@@ -59,6 +60,7 @@ const renderOptions = {
 }
 
 const MODEL_QUERY_PARAM = 'model'
+const CAMERA_STORAGE_PREFIX = 'jscad-viewer-camera:'
 
 let currentModel = null
 let currentMain = null
@@ -68,6 +70,87 @@ let panDelta = [0, 0]
 let zoomDelta = 0
 let pointerDown = false
 let lastPointer = [0, 0]
+let lastCameraSaveAt = 0
+
+const getCameraStorageKey = (modelId) => `${CAMERA_STORAGE_PREFIX}${modelId}`
+
+const clearModelCameraState = ({ modelId }) => {
+  if (!modelId) return
+
+  try {
+    window.localStorage.removeItem(getCameraStorageKey(modelId))
+  } catch {
+    // Ignore storage errors.
+  }
+}
+
+const saveModelCameraState = ({ modelId }) => {
+  if (!modelId) return
+
+  const payload = {
+    camera: {
+      target: state.camera.target,
+    },
+    controls: {
+      angles: state.controls.angles,
+      distance: state.controls.distance,
+    },
+  }
+
+  try {
+    window.localStorage.setItem(
+      getCameraStorageKey(modelId),
+      JSON.stringify(payload),
+    )
+  } catch {
+    // Ignore storage errors (private mode, quota exceeded, etc.).
+  }
+}
+
+const loadModelCameraState = ({ modelId }) => {
+  if (!modelId) return null
+
+  try {
+    const raw = window.localStorage.getItem(getCameraStorageKey(modelId))
+    if (!raw) return null
+
+    const parsed = JSON.parse(raw)
+    if (!parsed?.camera || !parsed?.controls) return null
+
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+const restoreModelCameraState = ({ modelId }) => {
+  const savedState = loadModelCameraState({ modelId })
+  if (!savedState) return false
+
+  if (savedState.camera?.target) {
+    state.camera.target = savedState.camera.target
+  }
+  if (savedState.controls?.angles) {
+    state.controls.angles = savedState.controls.angles
+  }
+  if (savedState.controls?.distance) {
+    state.controls.distance = savedState.controls.distance
+  }
+
+  // Recalculate camera position from controls (don't directly restore position)
+  const updated = orbitControls.update({
+    controls: state.controls,
+    camera: state.camera,
+  })
+  state.camera.position = updated.camera.position
+  state.camera.view = updated.camera.view
+  state.controls = { ...state.controls, ...updated.controls }
+
+  renderOptions.camera = state.camera
+  perspectiveCamera.update(state.camera)
+  needsRender = true
+  return true
+}
 
 const resizeCamera = () => {
   const width = Math.max(viewerElement.clientWidth, 1)
@@ -206,6 +289,14 @@ const updateControls = () => {
     perspectiveCamera.update(state.camera)
     renderer(renderOptions)
     needsRender = state.controls.changed
+
+    if (currentModel && state.controls.changed) {
+      const now = Date.now()
+      if (now - lastCameraSaveAt >= 250) {
+        saveModelCameraState({ modelId: currentModel.id })
+        lastCameraSaveAt = now
+      }
+    }
   }
 
   window.requestAnimationFrame(updateControls)
@@ -240,14 +331,14 @@ const updateModelChooserUi = ({ activeModelId }) => {
       .join('')
   }
 
-  if (modelListElement) {
-    modelListElement.innerHTML = models
-      .map((model) => {
-        const activeClass = model.id === activeModelId ? ' is-active' : ''
-        return `<button type="button" class="model-link${activeClass}" data-model-id="${model.id}">${model.title}</button>`
-      })
-      .join('')
-  }
+  // if (modelListElement) {
+  //   modelListElement.innerHTML = models
+  //     .map((model) => {
+  //       const activeClass = model.id === activeModelId ? ' is-active' : ''
+  //       return `<button type="button" class="model-link${activeClass}" data-model-id="${model.id}">${model.title}</button>`
+  //     })
+  //     .join('')
+  // }
 }
 
 const updateModelCopy = ({ model }) => {
@@ -271,6 +362,10 @@ const switchToModel = ({
     return
   }
 
+  if (currentModel?.id) {
+    saveModelCameraState({ modelId: currentModel.id })
+  }
+
   currentModel = nextModel
   currentMain = nextModel.main
 
@@ -282,6 +377,7 @@ const switchToModel = ({
   }
 
   renderModel()
+  restoreModelCameraState({ modelId: nextModel.id })
 }
 
 viewerElement.addEventListener('pointerdown', (event) => {
@@ -357,4 +453,18 @@ window.requestAnimationFrame(updateControls)
 
 exportButton?.addEventListener('click', () => {
   void exportCurrentModelAsStl()
+})
+
+resetCameraButton?.addEventListener('click', () => {
+  if (!currentModel?.id) return
+
+  clearModelCameraState({ modelId: currentModel.id })
+  renderModel()
+  saveModelCameraState({ modelId: currentModel.id })
+  statusElement.textContent = `Camera reset for ${currentModel.title}`
+})
+
+window.addEventListener('beforeunload', () => {
+  if (!currentModel?.id) return
+  saveModelCameraState({ modelId: currentModel.id })
 })

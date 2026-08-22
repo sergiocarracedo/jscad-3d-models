@@ -151,6 +151,33 @@ h1 {
   box-shadow: 0 10px 20px rgba(79, 141, 255, 0.18);
 }
 
+.secondary-button {
+  width: 100%;
+  margin: 0 0 16px;
+  padding: 11px 16px;
+  border: 1px solid rgba(198, 208, 221, 0.36);
+  border-radius: 999px;
+  background: rgba(198, 208, 221, 0.08);
+  color: #d6e0ec;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.secondary-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(198, 208, 221, 0.6);
+  background: rgba(198, 208, 221, 0.14);
+}
+
+.secondary-button:active {
+  transform: translateY(0);
+}
+
 .status {
   overflow: auto;
   margin: 0;
