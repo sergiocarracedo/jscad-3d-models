@@ -1,7 +1,7 @@
 import modeling from '@jscad/modeling'
 import { svgPathProperties } from 'svg-path-properties'
 import { SVGPathData } from 'svg-pathdata'
-import coasterSvgRaw from '../../losmasguarros-coaster/coasters.svg?raw'
+import coasterSvgRaw from '../../coaster-assets/coasters.svg?raw'
 
 const {
   booleans,

@@ -1,16 +1,32 @@
 {
-  "name": "xps-support",
+  "name": "jscad-3d-models",
   "version": "1.0.0",
-  "description": "",
+  "description": "Parametric 3D models defined with OpenJSCAD, served via a Vite viewer with STL export.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "oxfmt ."
   },
-  "keywords": [],
+  "keywords": [
+    "jscad",
+    "openjscad",
+    "3d",
+    "stl",
+    "modeling",
+    "3d-printing"
+  ],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sergiocarracedo/jscad-3d-models.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sergiocarracedo/jscad-3d-models/issues"
+  },
+  "homepage": "https://github.com/sergiocarracedo/jscad-3d-models#readme",
   "packageManager": "pnpm@10.26.1",
   "dependencies": {
     "@jscad/modeling": "^2.13.0",
