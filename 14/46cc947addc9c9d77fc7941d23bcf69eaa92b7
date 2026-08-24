@@ -1,0 +1,25 @@
+src/models/coasters.js
+  s_94130b87e1a023::t_e25a7e51556732 4
+.gitignore
+  s_94130b87e1a023::t_2f4e37deda15fe 1,3-9
+README.md
+  s_94130b87e1a023::t_2befcfb17e763e 1-131
+package.json
+  s_94130b87e1a023::t_38611bd969845b 2,4,9-10,12-19,22-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "1446cc947addc9c9d77fc7941d23bcf69eaa92b7",
+  "prompts": {},
+  "sessions": {
+    "s_94130b87e1a023": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fd73bf40effeaDG7YOfwRuXBjJ",
+        "model": "minimax/minimax-m3"
+      },
+      "human_author": "Sergio Carracedo <hi@sergiocarracedo.es>"
+    }
+  }
+}
