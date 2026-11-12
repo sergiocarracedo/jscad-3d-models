@@ -1,34 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html class="dark" data-theme="dark" lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3D Model Viewer</title>
   </head>
-  <body>
-    <div class="app-shell">
-      <aside class="panel">
-        <p class="eyebrow">OpenJSCAD</p>
-        <h1 id="model-title">Model Viewer</h1>
-        <p class="description" id="model-description">
-          Edit <code>src/models/*.js</code> and the viewer updates in real time.
-        </p>
-        <label class="field-label" for="model-select">Model</label>
-        <select id="model-select" class="model-select"></select>
-        <nav id="model-list" class="model-list"></nav>
-        <div class="help">
-          <p><strong>Orbit</strong>: drag</p>
-          <p><strong>Pan</strong>: shift + drag</p>
-          <p><strong>Zoom</strong>: mouse wheel</p>
-        </div>
-        <button id="export-stl" class="action-button" type="button">
-          Export STL
-        </button>
-        <button id="reset-camera" class="secondary-button" type="button">
-          Reset Camera
-        </button>
-        <pre id="status" class="status">Rendering model...</pre>
-      </aside>
+  <body class="bg-background text-foreground">
+    <div class="viewer-app app-shell">
+      <aside class="panel" id="side-menu"></aside>
       <main class="viewer-wrap">
         <div id="viewer" class="viewer"></div>
         <div class="axis-legend" aria-label="Axis legend">
